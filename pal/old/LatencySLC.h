@@ -19,15 +19,20 @@
 #define __LatencySLC_h__
 
 #include "Latency.h"
+#include "sim/config_reader.hh"
 
 class LatencySLC : public Latency {
  public:
   LatencySLC(SimpleSSD::PAL::Config::NANDTiming,
-             SimpleSSD::PAL::Config::NANDPower);
+             SimpleSSD::PAL::Config::NANDPower,
+             SimpleSSD::ConfigReader &conf);
   ~LatencySLC();
 
   uint64_t GetLatency(uint32_t, uint8_t, uint8_t) override;
   inline uint8_t GetPageType(uint32_t) override;
+
+  private:
+  SimpleSSD::ConfigReader &conf;  // Reference to the configuration object
 };
 
 #endif  //__LatencyTLC_h__

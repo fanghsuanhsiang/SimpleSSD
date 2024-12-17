@@ -23,7 +23,7 @@
 
 PAL2::PAL2(PALStatistics *statistics, SimpleSSD::PAL::Parameter *p,
            SimpleSSD::ConfigReader *c, Latency *l)
-    : pParam(p), lat(l), stats(statistics) {
+    : pParam(p), lat(l), stats(statistics), c(c) {
   uint32_t OriginalSizes[7];
 
   uint32_t SPDIV =
@@ -256,6 +256,20 @@ void PAL2::TimelineScheduling(Command &req, CPDPBP &reqCPD) {
 
         // 2b) LOOP1 - Find MEM avaiable slot in DieTimeSlots
         MEMtickFrom = DMA0tickFrom;
+
+        uint32_t blockperplane = pParam->block;
+        uint32_t blockperdie = pParam->block * pParam->plane;
+        uint32_t blockperpackage = pParam->block * pParam->plane * pParam->die;
+        uint32_t blockperchannel = pParam->block * pParam->plane * pParam->die * pParam->package;
+
+        if(c->readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_SEARCH_OP)) {
+              latMEM = latMEM * reqCPD.Channel * blockperchannel +
+                      latMEM * reqCPD.Package * blockperpackage +
+                      latMEM * reqCPD.Die * blockperdie +
+                      latMEM * reqCPD.Plane * blockperplane +
+                      latMEM * (reqCPD.Block + 1);
+            }
+
         if (!FindFreeTime(DieFreeSlots[reqDieIdx], (latDMA0 + latMEM),
                           MEMtickFrom, tickMEM, conflicts)) {
           if (MEMtickFrom < DieStartPoint[reqDieIdx]) {

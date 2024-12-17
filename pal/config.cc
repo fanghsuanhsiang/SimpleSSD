@@ -37,6 +37,7 @@ const char NAME_BLOCK[] = "Block";
 const char NAME_PAGE[] = "Page";
 const char NAME_PAGE_SIZE[] = "PageSize";
 const char NAME_USE_MULTI_PLANE_OP[] = "EnableMultiPlaneOperation";
+const char NAME_USE_SEARCH_OP[] = "EnableSearchOperation";
 const char NAME_DMA_SPEED[] = "DMASpeed";
 const char NAME_DMA_WIDTH[] = "DMAWidth";
 const char NAME_FLASH_TYPE[] = "NANDType";
@@ -49,6 +50,7 @@ const char NAME_NAND_CSB_WRITE[] = "CSBWrite";
 const char NAME_NAND_MSB_READ[] = "MSBRead";
 const char NAME_NAND_MSB_WRITE[] = "MSBWrite";
 const char NAME_NAND_ERASE[] = "Erase";
+const char NAME_NAND_BLOCK_READ[] = "BlockRead";
 
 /* NAND power TODO: seperate this */
 const char NAME_NAND_VOLTAGE[] = "Voltage";
@@ -75,6 +77,7 @@ Config::Config() {
   page = 512;
   pageSize = 16384;
   useMultiPlaneOperation = true;
+  useSearchOperation = true;
   dmaSpeed = 400;
   dmaWidth = 8;
   nandType = NAND_MLC;
@@ -87,6 +90,7 @@ Config::Config() {
   nandTiming.msb.read = 65000000;     // 65us
   nandTiming.msb.write = 1300000000;  // 1300us
   nandTiming.erase = 3500000000;      // 3.5ms
+  nandTiming.block.read = 50000000;    // 50us
 
   // Set NAND power (From: Micron's MT29F64*)
   nandPower.voltage = 3300;           // 3.3V
@@ -127,6 +131,9 @@ bool Config::setConfig(const char *name, const char *value) {
   else if (MATCH_NAME(NAME_USE_MULTI_PLANE_OP)) {
     useMultiPlaneOperation = convertBool(value);
   }
+  else if (MATCH_NAME(NAME_USE_SEARCH_OP)) {
+    useSearchOperation = convertBool(value);
+  }
   else if (MATCH_NAME(NAME_DMA_SPEED)) {
     dmaSpeed = strtoul(value, nullptr, 10);
   }
@@ -162,6 +169,9 @@ bool Config::setConfig(const char *name, const char *value) {
   }
   else if (MATCH_NAME(NAME_NAND_ERASE)) {
     nandTiming.erase = strtoul(value, nullptr, 10);
+  }
+  else if (MATCH_NAME(NAME_NAND_BLOCK_READ)) {
+    nandTiming.block.read = strtoul(value, nullptr, 10);
   }
   else if (MATCH_NAME(NAME_NAND_VOLTAGE)) {
     nandPower.voltage = strtoul(value, nullptr, 10);
@@ -350,6 +360,9 @@ bool Config::readBoolean(uint32_t idx) {
   switch (idx) {
     case NAND_USE_MULTI_PLANE_OP:
       ret = useMultiPlaneOperation;
+      break;
+    case NAND_USE_SEARCH_OP:
+      ret = useSearchOperation;
       break;
   }
 

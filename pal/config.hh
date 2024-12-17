@@ -38,6 +38,7 @@ typedef enum {
   NAND_PAGE,
   NAND_PAGE_SIZE,
   NAND_USE_MULTI_PLANE_OP,
+  NAND_USE_SEARCH_OP,
   NAND_DMA_SPEED,
   NAND_DMA_WIDTH,
   NAND_FLASH_TYPE,
@@ -73,6 +74,7 @@ class Config : public BaseConfig {
     PAGETiming lsb;
     PAGETiming csb;
     PAGETiming msb;
+    PAGETiming block;
     DMATiming dma0;
     DMATiming dma1;
     uint64_t erase;
@@ -99,6 +101,7 @@ class Config : public BaseConfig {
   uint32_t page;                //!< Default: 512
   uint32_t pageSize;            //!< Default: 16384
   bool useMultiPlaneOperation;  //!< Default: true
+  bool useSearchOperation;      //!< Default: true
   uint32_t dmaSpeed;            //!< Default: 400
   uint32_t dmaWidth;            //!< Default: 8
   NAND_TYPE nandType;           //!< Default: NAND_MLC

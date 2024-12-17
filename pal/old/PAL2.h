@@ -49,6 +49,7 @@ class PAL2  // let's not inherit PAL1
   SimpleSSD::PAL::Parameter *pParam;
   Latency *lat;
   PALStatistics *stats;  // statistics of PAL2, not created by itself
+  SimpleSSD::ConfigReader *c;
 
   std::list<TimeSlot> MergedTimeSlots;  // for gathering busy time
 

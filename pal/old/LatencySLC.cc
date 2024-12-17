@@ -18,8 +18,9 @@
 #include "LatencySLC.h"
 
 LatencySLC::LatencySLC(SimpleSSD::PAL::Config::NANDTiming t,
-                       SimpleSSD::PAL::Config::NANDPower p)
-    : Latency(t, p) {}
+                       SimpleSSD::PAL::Config::NANDPower p,
+                       SimpleSSD::ConfigReader &config)
+    : Latency(t, p), conf(config) {}
 
 LatencySLC::~LatencySLC() {}
 
@@ -28,6 +29,7 @@ inline uint8_t LatencySLC::GetPageType(uint32_t) {
 }
 
 uint64_t LatencySLC::GetLatency(uint32_t, uint8_t Oper, uint8_t Busy) {
+  static bool useSearchOP = conf.readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_SEARCH_OP);
   switch (Busy) {
     case BUSY_DMA0:
       if (Oper == OPER_READ) {
@@ -54,7 +56,10 @@ uint64_t LatencySLC::GetLatency(uint32_t, uint8_t Oper, uint8_t Busy) {
 
       break;
     case BUSY_MEM:
-      if (Oper == OPER_READ) {
+      if (Oper == OPER_READ && useSearchOP) {
+        return timing.block.read;
+      }
+      else if (Oper == OPER_READ) {
         return timing.lsb.read;
       }
       else if (Oper == OPER_WRITE) {

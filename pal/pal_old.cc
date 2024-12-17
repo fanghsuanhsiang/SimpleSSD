@@ -45,7 +45,7 @@ PALOLD::PALOLD(Parameter &p, ConfigReader &c)
 
   switch (conf.readInt(CONFIG_PAL, NAND_FLASH_TYPE)) {
     case NAND_SLC:
-      lat = new LatencySLC(*pTiming, *pPower);
+      lat = new LatencySLC(*pTiming, *pPower, c);
       break;
     case NAND_MLC:
       lat = new LatencyMLC(*pTiming, *pPower);
