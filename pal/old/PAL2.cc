@@ -262,13 +262,18 @@ void PAL2::TimelineScheduling(Command &req, CPDPBP &reqCPD) {
         uint32_t blockperpackage = pParam->block * pParam->plane * pParam->die;
         uint32_t blockperchannel = pParam->block * pParam->plane * pParam->die * pParam->package;
 
-        if(c->readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_SEARCH_OP)) {
-              latMEM = latMEM * reqCPD.Channel * blockperchannel +
-                      latMEM * reqCPD.Package * blockperpackage +
-                      latMEM * reqCPD.Die * blockperdie +
-                      latMEM * reqCPD.Plane * blockperplane +
-                      latMEM * (reqCPD.Block + 1);
-            }
+        if(c->readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_SEARCH_OP) &&
+          c->readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_MULTI_PLANE_SEARCH_OP)) {
+          latMEM = latMEM * ((reqCPD.Package * blockperpackage + reqCPD.Die * blockperdie + 
+                  reqCPD.Plane * blockperplane) / (pParam->die * pParam->plane) +
+                  ceil(((reqCPD.Block + 1) + (pParam->die * pParam->plane) - 1) / (pParam->die * pParam->plane)));
+        } else if(c->readBoolean(SimpleSSD::CONFIG_PAL, SimpleSSD::PAL::NAND_USE_SEARCH_OP)) {
+          latMEM = latMEM * reqCPD.Channel * blockperchannel +
+                  latMEM * reqCPD.Package * blockperpackage +
+                  latMEM * reqCPD.Die * blockperdie +
+                  latMEM * reqCPD.Plane * blockperplane +
+                  latMEM * (reqCPD.Block + 1);
+        }
 
         if (!FindFreeTime(DieFreeSlots[reqDieIdx], (latDMA0 + latMEM),
                           MEMtickFrom, tickMEM, conflicts)) {

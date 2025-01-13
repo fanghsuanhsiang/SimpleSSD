@@ -38,6 +38,7 @@ const char NAME_PAGE[] = "Page";
 const char NAME_PAGE_SIZE[] = "PageSize";
 const char NAME_USE_MULTI_PLANE_OP[] = "EnableMultiPlaneOperation";
 const char NAME_USE_SEARCH_OP[] = "EnableSearchOperation";
+const char NAME_USE_MULTI_PLANE_SEARCH_OP[] = "EnableMultiPlaneSearchOperation";
 const char NAME_DMA_SPEED[] = "DMASpeed";
 const char NAME_DMA_WIDTH[] = "DMAWidth";
 const char NAME_FLASH_TYPE[] = "NANDType";
@@ -78,6 +79,7 @@ Config::Config() {
   pageSize = 16384;
   useMultiPlaneOperation = true;
   useSearchOperation = true;
+  useMultiPlaneSearchOperation = true;
   dmaSpeed = 400;
   dmaWidth = 8;
   nandType = NAND_MLC;
@@ -133,6 +135,9 @@ bool Config::setConfig(const char *name, const char *value) {
   }
   else if (MATCH_NAME(NAME_USE_SEARCH_OP)) {
     useSearchOperation = convertBool(value);
+  }
+  else if (MATCH_NAME(NAME_USE_MULTI_PLANE_SEARCH_OP)) {
+    useMultiPlaneSearchOperation = convertBool(value);
   }
   else if (MATCH_NAME(NAME_DMA_SPEED)) {
     dmaSpeed = strtoul(value, nullptr, 10);
@@ -363,6 +368,9 @@ bool Config::readBoolean(uint32_t idx) {
       break;
     case NAND_USE_SEARCH_OP:
       ret = useSearchOperation;
+      break;
+    case NAND_USE_MULTI_PLANE_SEARCH_OP:
+      ret = useMultiPlaneSearchOperation;
       break;
   }
 
